@@ -20,7 +20,7 @@ TODO:
 [ ] scan with Trivy
 [ ] check Dockerfile
 [x] define securityContext
-[ ] investigate if Network Policy is needed
+[x] investigate if Network Policy is needed
 
 ### Platform
 TODO:
