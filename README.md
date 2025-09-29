@@ -13,7 +13,7 @@ TODO:
 [x] define resources limits and requests: CPU and memory
 [x] deside topologySpreadConstraints or podAntiAffinity
 [x] check if there is no shared state or other impediments for horizontal scaling
-[ ] investigate if Horizontal Pod Autoscaler (HPA) is needed
+[x] investigate if Horizontal Pod Autoscaler (HPA) is needed
 
 ### Security
 TODO:
