@@ -10,6 +10,7 @@ Create a Kubernetes deployment using the public Docker image kennethreitz/httpbi
 ### Sclability
 TODO:
 - Kubernetes deployemnts vs SteafulSet (or anything else)
+- define resources limits and requests: CPU, memory and volume
 - check if there is no shared state or other impediments for horizontal scaling
 - investigate if Horizontal Pod Autoscaler (HPA) is needed
 
