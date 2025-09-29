@@ -9,16 +9,17 @@ Create a Kubernetes deployment using the public Docker image kennethreitz/httpbi
 ## Breakdown: 
 ### Sclability
 TODO:
-[ ] Kubernetes deployemnts vs SteafulSet (or anything else)
+[x] Kubernetes deployemnts vs SteafulSet (or anything else)
 [x] define resources limits and requests: CPU and memory
-[ ] check if there is no shared state or other impediments for horizontal scaling
+[x] deside topologySpreadConstraints or podAntiAffinity
+[x] check if there is no shared state or other impediments for horizontal scaling
 [ ] investigate if Horizontal Pod Autoscaler (HPA) is needed
 
 ### Security
 TODO:
 [ ] scan with Trivy
 [ ] check Dockerfile
-[ ] define securityContext
+[x] define securityContext
 [ ] investigate if Network Policy is needed
 
 ### Platform
