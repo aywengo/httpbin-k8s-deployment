@@ -15,6 +15,8 @@ spec:
       containers:
       - name: httpbin
         image: kennethreitz/httpbin:latest
+        ports:
+        - containerPort: 80
         resources:
           limits:
             cpu: 500m
@@ -22,5 +24,7 @@ spec:
           requests:
             cpu: 100m
             memory: 64Mi
-        ports:
-        - containerPort: 80
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
