@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "httpbin.fullname" . }}
+  labels:
+    app: {{ include "httpbin.name" . }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "httpbin.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "httpbin.name" . }}
+    spec:
+      {{- if not .Values.autoscaling.enabled }}
+      replicas: {{ .Values.replicaCount }}
+      {{- end }}
+      containers:
+      - name: httpbin
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+        securityContext:
+          runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
+          runAsUser: {{ .Values.securityContext.runAsUser }}
+          allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
+          readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+          {{- if .Values.securityContext.capabilitiesDropAll }}
+          capabilities:
+            drop: ["ALL"]
+          {{- end }}
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: {{ include "httpbin.name" . }}
+

@@ -29,6 +29,103 @@ TODO:
 
 ### Platform
 TODO:
-- [ ] prepare YAML of objects
-- [ ] wrap into Helm Chart
-- [ ] prepare demo in minikube with docs
+[x] prepare YAML of objects
+[x] wrap into Helm Chart
+[ ] prepare demo in minikube with docs
+  
+## Solution
+
+### 1. Plain yaml usage
+Plain yaml is a good way to deploy applications in Kubernetes. It's easy to understand and debug.
+
+#### Requirements
+- Kubernetes cluster with kubectl context
+- create or choose namespace: `kubectl create namespace httpbin` or use existing namespace `kkubectl config set-context --current --namespace=httpbin`
+
+
+#### Deployment only
+```bash
+kubectl apply -f yaml/deployment.yaml
+```
+
+#### Expose service (for in-cluster access only)
+```bash
+kubectl apply -f yaml/service.yaml
+```
+
+#### Implement autoscaling
+```bash
+kubectl apply -f yaml/hpa.yaml
+```
+
+#### Define NetworkPolicy
+```bash
+kubectl apply -f yaml/netpol.yaml
+```
+
+#### All at once
+```bash
+kubectl apply -f yaml/*.yaml
+```
+
+#### Scaling manually
+```bash
+kubectl scale deployment httpbin --replicas=3
+```
+
+#### Delete all
+```bash
+kubectl delete -f yaml/*.yaml
+```
+
+#### Debugging
+```bash
+kubectl describe deployment httpbin
+kubectl get deploy,po,svc
+kubectl get hpa
+kubectl get networkpolicy
+```
+
+### 2. Helm Chart
+
+Helm simplifies deployment, scaling, and management of applications in Kubernetes.
+
+#### Requirements
+- Helm v3
+- Kubernetes cluster with kubectl context
+- For autoscaling: metrics-server installed
+
+#### Debugging
+```bash
+helm template httpbin ./helm
+```
+
+#### Minimal setup (deployment only)
+Installs a single replica; HPA and NetworkPolicy disabled by default.
+
+```bash
+helm install httpbin ./helm
+kubectl get deploy,po,svc
+```
+
+Uninstall:
+```bash
+helm uninstall httpbin
+```
+
+#### With autoscaling
+```bash
+helm upgrade --install httpbin ./helm \
+  --set autoscaling.enabled=true \
+  --set autoscaling.minReplicas=3 \
+  --set autoscaling.maxReplicas=10 \
+  --set autoscaling.targetCPUUtilizationPercentage=50
+kubectl get hpa
+```
+
+#### With NetworkPolicy
+```bash
+helm upgrade --install httpbin ./helm \
+  --set networkPolicy.enabled=true
+kubectl get networkpolicy
+```
