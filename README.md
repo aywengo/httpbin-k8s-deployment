@@ -48,6 +48,8 @@ Plain yaml is a good way to deploy applications in Kubernetes. It's easy to unde
 kubectl apply -f yaml/deployment.yaml
 ```
 
+Probes: the Deployment includes simple readiness and liveness probes hitting `/status/200` on port 80.
+
 #### Expose service (for in-cluster access only)
 ```bash
 kubectl apply -f yaml/service.yaml
@@ -85,6 +87,10 @@ kubectl get deploy,po,svc
 kubectl get hpa
 kubectl get networkpolicy
 ```
+Check probe status by describing a Pod:
+```bash
+kubectl describe pod -l app=httpbin
+```
 
 ### 2. Helm Chart
 
@@ -106,6 +112,16 @@ Installs a single replica; HPA and NetworkPolicy disabled by default.
 ```bash
 helm install httpbin ./helm
 kubectl get deploy,po,svc
+```
+
+Probes: readiness and liveness probes are enabled by default and check `/status/200` on port 80.
+
+Configure probes via values or flags, for example:
+```bash
+helm upgrade --install httpbin ./helm \
+  --set readinessProbe.httpGet.path=/status/200 \
+  --set readinessProbe.initialDelaySeconds=5 \
+  --set livenessProbe.initialDelaySeconds=10
 ```
 
 Uninstall:

@@ -24,6 +24,28 @@ securityContext:
   readOnlyRootFilesystem: true
   capabilitiesDropAll: true
 
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /status/200
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /status/200
+    port: 80
+  initialDelaySeconds: 15
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+  successThreshold: 1
+
 autoscaling:
   enabled: false
   minReplicas: 3
