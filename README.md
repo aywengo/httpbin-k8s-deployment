@@ -172,6 +172,14 @@ kubectl get networkpolicy
 - Scale down replicas: `helm upgrade httpbin ../helm --set replicaCount=2`
 - Tear down: `helm uninstall httpbin`
 
+### Test Steps (macOS/Linux hosts override)
+- Start Minikube: `minikube start`
+- Deploy using YAML (`kubectl apply -f ../yaml/`) or Helm (`helm upgrade --install httpbin ../helm`)
+- Fetch the Minikube IP: `minikube ip`
+- Edit `/etc/hosts` (requires sudo) and add `MINIKUBE_IP playson.test`
+- Verify the service: `curl http://playson.test/status/200`
+- Remove the `/etc/hosts` entry when finished testing
+
 ### Demonstrate Node Scaling & Pod Distribution
 - Add a node: `minikube node add`
 - Wait for scheduling: `kubectl get nodes`
