@@ -31,7 +31,7 @@ TODO:
 TODO:
 [x] prepare YAML of objects
 [x] wrap into Helm Chart
-[ ] prepare demo in minikube with docs
+[x] prepare demo in minikube with docs
   
 ## Solution
 
@@ -145,3 +145,44 @@ helm upgrade --install httpbin ./helm \
   --set networkPolicy.enabled=true
 kubectl get networkpolicy
 ```
+
+## Test
+
+### Prerequisites
+- Minikube running locally (`minikube start`)
+- Kubectl configured to point to Minikube (`kubectl config use-context minikube`)
+- Helm v3 installed (`helm version`) for chart-based tests
+
+### Test Steps (YAML)
+- Adjust HPA limits in `../yaml/hpa.yaml` (`minReplicas`/`maxReplicas`) to match your test scenario
+- Apply manifests: `kubectl apply -f ../yaml/`
+- Confirm pods are ready: `kubectl get pods -l app=httpbin`
+- Port-forward the service: `kubectl port-forward svc/httpbin 8080:80`
+- Verify HTTP response: `curl http://localhost:8080/status/200`
+- Scale up replicas: `kubectl scale deployment httpbin --replicas=4`
+- Scale down replicas: `kubectl scale deployment httpbin --replicas=2`
+- Clean up manifests: `kubectl delete -f ../yaml/`
+
+### Test Steps (Helm)
+- Install the chart: `helm upgrade --install httpbin ../helm`
+- Confirm pods are ready: `kubectl get pods -l app=httpbin`
+- Port-forward the service: `kubectl port-forward svc/httpbin 8080:80`
+- Verify HTTP response: `curl http://localhost:8080/status/200`
+- Scale up replicas: `helm upgrade httpbin ../helm --set replicaCount=4`
+- Scale down replicas: `helm upgrade httpbin ../helm --set replicaCount=2`
+- Tear down: `helm uninstall httpbin`
+
+### Demonstrate Node Scaling & Pod Distribution
+- Add a node: `minikube node add`
+- Wait for scheduling: `kubectl get nodes`
+- Scale deployment: `kubectl scale deployment httpbin --replicas=4`
+- Check pod spread: `kubectl get pods -o wide -l app=httpbin`
+- Remove a node: `minikube node delete --name <node-name>` (evicts pods)
+- Watch rescheduling: `kubectl get pods -w -l app=httpbin`
+
+## Reference Docs
+- Kubernetes Deployment: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+- Kubernetes Service: https://kubernetes.io/docs/concepts/services-networking/service/
+- Horizontal Pod Autoscaler (HPA): https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+- NetworkPolicy: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+- Helm Charts: https://helm.sh/docs/topics/charts/
