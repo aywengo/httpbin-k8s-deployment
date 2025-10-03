@@ -22,8 +22,7 @@ TODO:
 
 ### Security
 TODO:
-- [ ] scan with Trivy
-- [ ] check Dockerfile
+- [x] check Dockerfile
 - [x] define securityContext
 - [x] investigate if Network Policy is needed
 
@@ -32,6 +31,7 @@ TODO:
 [x] prepare YAML of objects
 [x] wrap into Helm Chart
 [x] prepare demo in minikube with docs
+[x] prepare smoke test script
   
 ## Solution
 
@@ -152,6 +152,10 @@ kubectl get networkpolicy
 - Minikube running locally (`minikube start`)
 - Kubectl configured to point to Minikube (`kubectl config use-context minikube`)
 - Helm v3 installed (`helm version`) for chart-based tests
+
+### Automated Smoke Test Script
+- Requires `curl`
+- Run `./testing/test_httpbin.sh <host>` to exercise common httpbin endpoints (for local port-forwarding use `http://localhost:8080`)
 
 ### Test Steps (YAML)
 - Adjust HPA limits in `../yaml/hpa.yaml` (`minReplicas`/`maxReplicas`) to match your test scenario
