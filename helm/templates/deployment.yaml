@@ -26,9 +26,15 @@ spec:
           limits:
             cpu: {{ .Values.resources.limits.cpu }}
             memory: {{ .Values.resources.limits.memory }}
+            {{- if .Values.resources.limits.ephemeralStorage }}
+            ephemeral-storage: {{ .Values.resources.limits.ephemeralStorage }}
+            {{- end }}
           requests:
             cpu: {{ .Values.resources.requests.cpu }}
             memory: {{ .Values.resources.requests.memory }}
+            {{- if .Values.resources.requests.ephemeralStorage }}
+            ephemeral-storage: {{ .Values.resources.requests.ephemeralStorage }}
+            {{- end }}
         securityContext:
           runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
           runAsUser: {{ .Values.securityContext.runAsUser }}
@@ -60,6 +66,13 @@ spec:
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
         {{- end }}
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: var-tmp
+          mountPath: /var/tmp
+        - name: usr-tmp
+          mountPath: /usr/tmp
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -67,4 +80,11 @@ spec:
         labelSelector:
           matchLabels:
             app: {{ include "httpbin.name" . }}
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: var-tmp
+        emptyDir: {}
+      - name: usr-tmp
+        emptyDir: {}
 

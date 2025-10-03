@@ -13,9 +13,11 @@ resources:
   limits:
     cpu: 500m
     memory: 128Mi
+    ephemeralStorage: 256Mi
   requests:
     cpu: 100m
     memory: 64Mi
+    ephemeralStorage: 128Mi
 
 securityContext:
   runAsNonRoot: true

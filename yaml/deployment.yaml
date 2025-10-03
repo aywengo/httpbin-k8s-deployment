@@ -48,6 +48,13 @@ spec:
           timeoutSeconds: 2
           failureThreshold: 3
           successThreshold: 1
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: var-tmp
+          mountPath: /var/tmp
+        - name: usr-tmp
+          mountPath: /usr/tmp
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
@@ -55,3 +62,10 @@ spec:
         labelSelector:
           matchLabels:
             app: httpbin
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: var-tmp
+        emptyDir: {}
+      - name: usr-tmp
+        emptyDir: {}
