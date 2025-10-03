@@ -35,6 +35,48 @@ TODO:
   
 ## Solution
 
+### Image provenance
+- Upstream `kennethreitz/httpbin` only publishes `latest` and `test` tags (last update ~2018).
+- Documented digest for `kennethreitz/httpbin:latest` (retrieved 2025-10-03): `sha256:b138b9264903f46a43e1c750e07dc06f5d2a1bd5d51f37fb185bc608f61090dd`.
+- The image itself does not follow current container hardening best practices, so we rely on Kubernetes controls (securityContext, NetworkPolicy, HPA) and must at least verify the digest before each deployment.
+- Use the digest when pinning in clusters that require immutable references.
+- Consider rebuilding `httpbin` from source on a modern base image and publishing an internal image to eliminate the legacy vulnerabilities listed below.
+
+#### Vulnerability snapshot (Trivy)
+- `trivy image --severity CRITICAL,HIGH kennethreitz/httpbin:latest`
+- Scan date: 2025-10-03
+- Findings: 83 HIGH (Ubuntu 18.04 base packages), 3 CRITICAL (Python libraries)
+
+```
+$ trivy image --severity CRITICAL,HIGH kennethreitz/httpbin:latest
+...snip...
+Python (python-pkg)
+===================
+Total: 11 (HIGH: 8, CRITICAL: 3)
+
+PyYAML (PKG-INFO)
+  • CVE-2017-18342  CRITICAL  installed=3.13  fixed=4.1   arbitrary code execution via yaml.load()
+  • CVE-2020-14343  CRITICAL  installed=3.13  fixed=5.4   incomplete fix for CVE-2020-1747
+
+gevent (METADATA)
+  • CVE-2023-41419  CRITICAL  installed=1.3.7  fixed=23.9.0  remote privilege escalation in WSGIServer
+
+Werkzeug (METADATA)
+  • CVE-2019-14322  HIGH  installed=0.14.1  fixed=0.15.5  path traversal in SharedDataMiddleware
+  • CVE-2023-25577  HIGH  installed=0.14.1  fixed=2.2.3  multipart form parsing DoS
+  • CVE-2024-34069  HIGH  installed=0.14.1  fixed=3.0.3  debugger PIN bypass leads to RCE risk
+
+libssl1.1 (ubuntu 18.04)
+  • CVE-2021-3711  HIGH  installed=1.1.0g-2ubuntu4.1  fixed=1.1.1-1ubuntu2.1~18.04.13  SM2 decryption overflow
+  • CVE-2022-0778  HIGH  installed=1.1.0g-2ubuntu4.1  fixed=1.1.1-1ubuntu2.1~18.04.15  BN_mod_sqrt() infinite loop
+
+linux-libc-dev (ubuntu 18.04)
+  • CVE-2022-2586  HIGH  installed=4.15.0-191.202  fixed>4.15.0-198  nf_tables use-after-free
+  • CVE-2022-42896 HIGH  installed=4.15.0-202.213  fixed>4.15.0-204  Bluetooth l2cap use-after-free
+...snip...
+WARN: This OS version is no longer supported by the distribution (ubuntu 18.04)
+```
+
 ### 1. Plain yaml usage
 Plain yaml is a good way to deploy applications in Kubernetes. It's easy to understand and debug.
 
@@ -156,6 +198,17 @@ kubectl get networkpolicy
 ### Automated Smoke Test Script
 - Requires `curl`
 - Run `./testing/test_httpbin.sh <host>` to exercise common httpbin endpoints (for local port-forwarding use `http://localhost:8080`)
+
+Example output against a port-forwarded service:
+```
+$ ./testing/test_httpbin.sh http://localhost:8080
+[PASS] GET http://localhost:8080/status/200 returned 200
+[PASS] GET http://localhost:8080/delay/1 returned 200
+[PASS] GET http://localhost:8080/anything/test returned 200
+[PASS] POST http://localhost:8080/post returned 200
+[PASS] GET http://localhost:8080/uuid returned 200
+All checks passed.
+```
 
 ### Test Steps (YAML)
 - Adjust HPA limits in `../yaml/hpa.yaml` (`minReplicas`/`maxReplicas`) to match your test scenario

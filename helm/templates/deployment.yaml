@@ -5,6 +5,9 @@ metadata:
   labels:
     app: {{ include "httpbin.name" . }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ include "httpbin.name" . }}
@@ -13,9 +16,6 @@ spec:
       labels:
         app: {{ include "httpbin.name" . }}
     spec:
-      {{- if not .Values.autoscaling.enabled }}
-      replicas: {{ .Values.replicaCount }}
-      {{- end }}
       containers:
       - name: httpbin
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
