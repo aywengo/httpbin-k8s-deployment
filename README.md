@@ -28,10 +28,10 @@ TODO:
 
 ### Platform
 TODO:
-[x] prepare YAML of objects
-[x] wrap into Helm Chart
-[x] prepare demo in minikube with docs
-[x] prepare smoke test script
+- [x] prepare YAML of objects
+- [x] wrap into Helm Chart
+- [x] prepare demo in minikube with docs
+- [x] prepare smoke test script
   
 ## Solution
 
